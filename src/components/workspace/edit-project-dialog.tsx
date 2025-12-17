@@ -207,7 +207,7 @@ export function EditProjectDialog({
         <DialogFooter>
           <div className="flex w-full justify-between">
             <div className="flex h-full items-center">
-              {mode === "edit" && projectId !== "playground" && (
+              {mode === "edit" && projectId !== "default" && (
                 <Button variant="destructive" onClick={handleDeleteProject}>
                   Delete
                 </Button>

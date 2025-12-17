@@ -44,7 +44,7 @@ export async function createProject({
   if (existsSync(projectFolderPath)) {
     throw new Error("Project already exists");
   }
-  await mkdir(projectFolderPath);
+  await mkdir(projectFolderPath, { recursive: true });
   const projectFilePath = getProjectFilePath(projectId);
   const project = { ...data, id: projectId };
   await writeFile(projectFilePath, JSON.stringify(project, null, 2));
