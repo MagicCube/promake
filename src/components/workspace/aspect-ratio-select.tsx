@@ -51,7 +51,7 @@ export function AspectRatioSelect({
       <PromptInputHoverCardTrigger className="inline-block">
         <PromptInputButton className="px-1! py-2" size="xs" variant="ghost">
           <AspectIcon className="size-3" aspectRatio={value} />
-          <span className="text-xs">{formatAspectRatio(value)}</span>
+          <span className="font-normal">{formatAspectRatio(value)}</span>
         </PromptInputButton>
       </PromptInputHoverCardTrigger>
       <PromptInputHoverCardContent className="w-60 p-0">

@@ -29,7 +29,7 @@ export function BatchSizeSelect({
             />
             <X className={cn("size-2", batchSize > 1 ? "text-primary" : "")} />
             <span
-              className={cn("text-xs", batchSize > 1 ? "text-primary" : "")}
+              className={cn("font-normal", batchSize > 1 ? "text-primary" : "")}
             >
               {batchSize}
             </span>

@@ -22,7 +22,7 @@ export function ResolutionSelect({
     <PromptInputHoverCard openDelay={200} closeDelay={100}>
       <PromptInputHoverCardTrigger className="inline-block">
         <PromptInputButton className="px-1! py-2" size="xs" variant="ghost">
-          <div className="flex items-center justify-center gap-0.5 rounded border-[0.5px] border-white px-2 text-[8px]">
+          <div className="flex items-center justify-center gap-0.5 rounded border-[0.5px] border-white px-2 text-xs">
             {resolution.toUpperCase()}
           </div>
         </PromptInputButton>
