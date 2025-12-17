@@ -91,11 +91,12 @@ export function NavBreadcrumb() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   key="create"
+                  className="text-primary!"
                   onSelect={() => setProjectDialogOpen(true)}
                 >
                   <div className="flex h-9 w-60 items-center gap-4">
                     <div className="flex w-8 items-center justify-center">
-                      <Plus className="size-6" />
+                      <Plus className="text-primary size-6" />
                     </div>
                     <div>New project</div>
                   </div>
