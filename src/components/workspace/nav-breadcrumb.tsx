@@ -63,7 +63,7 @@ export function NavBreadcrumb() {
                   <ChevronsUpDown className="h-4 w-4 opacity-50" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent align="start">
                 {projects?.map((project) => (
                   <DropdownMenuItem key={project.id}>
                     <Link
