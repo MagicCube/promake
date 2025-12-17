@@ -25,7 +25,7 @@ export default function RootLayout({
         <title>{appMetadata.title}</title>
       </head>
       <body>
-        <ThemeProvider attribute="class" defaultTheme="dark">
+        <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark">
           <TRPCReactProvider>
             {children}
             <Toaster position="top-right" duration={1000} />

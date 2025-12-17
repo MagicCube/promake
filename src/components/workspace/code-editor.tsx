@@ -164,7 +164,7 @@ export function CodeEditor({
             "opacity-50": readonly ?? disabled,
           },
         )}
-        theme={currentTheme === "dark" ? customDarkTheme : customLightTheme}
+        theme={customDarkTheme}
         extensions={buildCMExtension({ attachments, settings })}
         basicSetup={{
           foldGutter: settings?.foldGutter ?? false,
