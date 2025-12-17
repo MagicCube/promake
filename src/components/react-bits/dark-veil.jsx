@@ -85,10 +85,15 @@ export default function DarkVeil({
   warpAmount = 0,
   resolutionScale = 1,
 }) {
+  /**
+   * @type {React.RefObject<HTMLCanvasElement | null>}
+   */
   const ref = useRef(null);
   useEffect(() => {
     const canvas = ref.current;
-    const parent = canvas.parentElement;
+    const parent = canvas?.parentElement;
+
+    if (!canvas || !parent) return;
 
     const renderer = new Renderer({
       dpr: Math.min(window.devicePixelRatio, 2),
