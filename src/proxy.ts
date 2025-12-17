@@ -1,5 +1,3 @@
-export const runtime = "nodejs";
-
 import fs from "fs";
 import path from "path";
 
@@ -7,12 +5,11 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { getSession } from "@/server/better-auth/server";
 
-import { createProject } from "./server/biz-logic/project";
-
 const PROTECTED_PATHS = ["/workspace"];
 
-export default async function auth(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   const session = await getSession();
+
   if (
     !session?.user &&
     PROTECTED_PATHS.some((path) => req.nextUrl.pathname.includes(path))
@@ -26,6 +23,7 @@ export default async function auth(req: NextRequest) {
   }
 
   const parts = req.nextUrl.pathname.split("/").filter(Boolean);
+
   if (
     parts[0] === "workspace" &&
     parts[1] === "projects" &&
@@ -34,16 +32,6 @@ export default async function auth(req: NextRequest) {
   ) {
     const projectId = parts[2];
     const projectPath = path.join("./public/data/projects/", projectId);
-
-    if (projectId === "default" && !fs.existsSync(projectPath)) {
-      await createProject({
-        projectId,
-        data: {
-          name: "Playground",
-          generations: [],
-        },
-      });
-    }
 
     if (fs.existsSync(projectPath)) {
       return NextResponse.next();
