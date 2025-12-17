@@ -16,7 +16,7 @@ export default function SignInPage() {
   return (
     <div className="relative flex h-screen w-screen">
       <Header />
-      <Background speed={2} />
+      <Background speed={1.6} hueShift={66} noiseIntensity={0.1} />
       <div className="pointer-events-none absolute right-0 left-0 flex size-full items-center justify-center">
         <SignInForm />
       </div>

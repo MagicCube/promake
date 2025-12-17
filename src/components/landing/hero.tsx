@@ -12,7 +12,7 @@ export function Hero() {
   return (
     <section className="relative flex min-h-screen w-full items-center justify-center overflow-hidden pt-16">
       <div className="absolute inset-0 z-0 size-full">
-        <Background />
+        <Background speed={1.6} hueShift={66} noiseIntensity={0.1} />
       </div>
       <div className="relative z-10 container flex flex-col items-center px-4 md:px-6">
         <div className="mx-auto max-w-4xl text-center">
