@@ -49,10 +49,6 @@ export function GenerationCard({
     );
   }, [generation.defaultOutputId, generation.outputs]);
 
-  const handleCopyGenerationId = useCallback(async () => {
-    await navigator.clipboard.writeText(generation.id);
-    toast("Generation ID copied to clipboard");
-  }, [generation.id]);
   const handleCopyPrompt = useCallback(async () => {
     await navigator.clipboard.writeText(generation.input.prompt);
     toast("Prompt copied to clipboard");
@@ -91,16 +87,6 @@ export function GenerationCard({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel className="text-xs">
-                <div className="text-muted-foreground px-2 py-2">
-                  # {generation.id}
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={handleCopyGenerationId}>
-                <Hash />
-                <span>Copy ID</span>
-              </DropdownMenuItem>
               <DropdownMenuItem onSelect={handleCopyPrompt}>
                 <Copy />
                 <span>Copy Prompt</span>
