@@ -104,7 +104,13 @@ export const router = createTRPCRouter({
           }
         }
         try {
-          const { buffer, mimeType } = await provider.generate(input);
+          if (!provider.generate) {
+            throw new Error(
+              `Provider ${provider.name} does not support single generate`,
+            );
+          }
+          const res = await provider.generate(input);
+          const { buffer, mimeType } = res;
           switch (mimeType) {
             case "image/png":
               filename += ".png";
@@ -138,6 +144,51 @@ export const router = createTRPCRouter({
             error: (error as Error).message,
           };
         }
+      },
+    ),
+  batchGenerate: protectedProcedure
+    .input(
+      z.object({
+        projectId: z.string(),
+        generationId: z.string(),
+        input: GenerationInput,
+        batchSize: z.number(),
+      }),
+    )
+    .mutation(
+      async ({ input: { input, projectId, generationId, batchSize } }) => {
+        const provider = createGenerationProvider(input.provider);
+        if (!provider.batchGenerate) {
+          throw new Error(
+            `Provider ${provider.name} does not support batch generate`,
+          );
+        }
+        if (input.referenceImageURLs) {
+          let refIndex = 0;
+          for (const url of input.referenceImageURLs) {
+            const filePath = path.join(
+              getProjectFolderPath(projectId),
+              generationId,
+              "refs",
+              url,
+            );
+            const dataURL = await convertToDataURL(filePath);
+            input.referenceImageURLs[refIndex] = dataURL;
+            refIndex++;
+          }
+        }
+        const outputs = await provider.batchGenerate(input, batchSize);
+        return outputs.map((output) => {
+          const file =
+            "https://file.302.ai/gpt/imgs/20251218/6efbcfd46f07405196a4099658c82a28.jpg";
+          const id = /imgs\/\d{8}\/(\w+)\.jpg/.exec(file)![1]!;
+          return {
+            id,
+            url: output.url,
+            state: "completed",
+            mimeType: output.mimeType,
+          };
+        });
       },
     ),
 });

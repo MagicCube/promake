@@ -166,10 +166,14 @@ export function CardImage({
       </div>
     );
   } else if (image.state === "completed" && image.url) {
+    let url = image.url;
+    if (!url.startsWith("http")) {
+      url = `/data/projects/${projectId}/${generationId}/${image.url}`;
+    }
     return (
       <img
         className={cn("size-full object-cover", className)}
-        src={`/data/projects/${projectId}/${generationId}/${image.url}`}
+        src={url}
         alt=""
         onClick={onClick}
         onDoubleClick={onDoubleClick}

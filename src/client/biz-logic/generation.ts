@@ -1,9 +1,11 @@
 import { useCallback } from "react";
 
+import { useProviders } from "@/components/workspace/model-select";
 import {
   type GenerationOutput,
   type Generation,
   type GenerationInput,
+  type GenerativeModel,
 } from "@/core/types";
 import { nanoid } from "@/core/utils/nanoid";
 import { api } from "@/trpc/react";
@@ -55,6 +57,8 @@ export function useRegenerate() {
   const optimisticUpdateGenerationOutput =
     useOptimisticUpdateGenerationOutput();
   const generate = api.generation.generate.useMutation();
+  const batchGenerate = api.generation.batchGenerate.useMutation();
+  const providers = useProviders();
   const callback = useCallback(
     async ({
       projectId,
@@ -63,6 +67,22 @@ export function useRegenerate() {
       projectId: string;
       generation: Generation;
     }) => {
+      let model: GenerativeModel | undefined;
+      for (const provider of providers) {
+        if (provider.name === generation.input.provider) {
+          for (const m of provider.supportedModels) {
+            if (m.name === generation.input.model) {
+              model = m;
+              break;
+            }
+          }
+          break;
+        }
+      }
+      if (!model) {
+        throw new Error(`Model ${generation.input.provider} not found`);
+      }
+
       const outputs: GenerationOutput[] = [];
       let startIndex = 1;
       if (generation.outputs.length > 0) {
@@ -92,33 +112,65 @@ export function useRegenerate() {
           outputs,
         },
       });
-      const promises = outputs.map(async (output) => {
-        const newOutput = await generate.mutateAsync({
+
+      if (model.supportBatchGeneration) {
+        const outputs = await batchGenerate.mutateAsync({
           projectId,
           generationId: generation.id,
-          outputId: output.id,
           input: generation.input,
+          batchSize: generation.batchSize,
         });
-        await updateGenerationOutput.mutateAsync({
+        await updateGeneration.mutateAsync({
           projectId,
           generationId: generation.id,
-          outputId: output.id,
-          data: newOutput,
+          data: {
+            outputs: outputs.map((output) => ({
+              ...output,
+              state: "completed",
+            })),
+          },
         });
-        optimisticUpdateGenerationOutput({
+        optimisticUpdateGeneration({
           projectId,
           generationId: generation.id,
-          outputId: output.id,
-          data: newOutput,
+          data: {
+            outputs: outputs.map((output) => ({
+              ...output,
+              state: "completed",
+            })),
+          },
         });
-        return newOutput;
-      });
-      await Promise.all(promises);
+      } else {
+        const promises = outputs.map(async (output) => {
+          const newOutput = await generate.mutateAsync({
+            projectId,
+            generationId: generation.id,
+            outputId: output.id,
+            input: generation.input,
+          });
+          await updateGenerationOutput.mutateAsync({
+            projectId,
+            generationId: generation.id,
+            outputId: output.id,
+            data: newOutput,
+          });
+          optimisticUpdateGenerationOutput({
+            projectId,
+            generationId: generation.id,
+            outputId: output.id,
+            data: newOutput,
+          });
+          return newOutput;
+        });
+        await Promise.all(promises);
+      }
     },
     [
+      batchGenerate,
       generate,
       optimisticUpdateGeneration,
       optimisticUpdateGenerationOutput,
+      providers,
       updateGeneration,
       updateGenerationOutput,
     ],

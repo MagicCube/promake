@@ -33,6 +33,7 @@ import {
 import { AspectRatioSelect } from "./aspect-ratio-select";
 import { BatchSizeSelect } from "./batch-size-select";
 import { CodeEditor } from "./code-editor";
+import { ModelSelect, useModel } from "./model-select";
 import { ResolutionSelect } from "./resolution-select";
 
 export function CreateGenerationCard({
@@ -63,6 +64,21 @@ export function CreateGenerationCard({
   const attachments = usePromptInputAttachments();
   const createGeneration = useCreateGeneration();
   const regenerate = useRegenerate();
+  const selectedModel = useModel(generationInput.model);
+  useEffect(() => {
+    if (!selectedModel) return;
+    if (selectedModel.supportedBatchSizes?.length) {
+      if (!selectedModel.supportedBatchSizes.includes(batchSize)) {
+        setBatchSize(selectedModel.supportedBatchSizes[0]!);
+        saveLocalSettings({
+          lastGeneration: {
+            ...generationInput,
+            batchSize,
+          },
+        });
+      }
+    }
+  }, [selectedModel, batchSize, generationInput]);
   const handleSubmit = useCallback(
     async ({ files }: PromptInputMessage) => {
       const generation = await createGeneration({
@@ -129,8 +145,27 @@ export function CreateGenerationCard({
       </CardContent>
       <CardFooter className="flex shrink-0 justify-between px-4">
         <div className="flex gap-2">
+          <ModelSelect
+            modelName={generationInput.model}
+            onSelect={(value, provider) => {
+              setGenerationInput({
+                ...generationInput,
+                model: value,
+                provider,
+              });
+              saveLocalSettings({
+                lastGeneration: {
+                  ...generationInput,
+                  model: value,
+                  provider,
+                  batchSize,
+                },
+              });
+            }}
+          />
           <BatchSizeSelect
             batchSize={batchSize}
+            supportedBatchSizes={selectedModel?.supportedBatchSizes}
             onSelect={(value) => {
               setBatchSize(value);
               saveLocalSettings({
@@ -157,22 +192,25 @@ export function CreateGenerationCard({
               });
             }}
           />
-          <ResolutionSelect
-            resolution={generationInput.resolution ?? "1k"}
-            onSelect={(value) => {
-              setGenerationInput({
-                ...generationInput,
-                resolution: value,
-              });
-              saveLocalSettings({
-                lastGeneration: {
-                  ...generationInput,
-                  batchSize,
-                  resolution: value,
-                },
-              });
-            }}
-          />
+          {selectedModel?.supportedResolutions?.length !== undefined &&
+            selectedModel.supportedResolutions.length > 0 && (
+              <ResolutionSelect
+                resolution={generationInput.resolution ?? "1k"}
+                onSelect={(value) => {
+                  setGenerationInput({
+                    ...generationInput,
+                    resolution: value,
+                  });
+                  saveLocalSettings({
+                    lastGeneration: {
+                      ...generationInput,
+                      batchSize,
+                      resolution: value,
+                    },
+                  });
+                }}
+              />
+            )}
         </div>
         <div className="flex">
           <Button

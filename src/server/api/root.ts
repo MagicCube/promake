@@ -1,5 +1,6 @@
 import { router as generation } from "@/server/api/routers/generation";
 import { router as project } from "@/server/api/routers/project";
+import { router as provider } from "@/server/api/routers/provider";
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 
 /**
@@ -10,6 +11,7 @@ import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 export const appRouter = createTRPCRouter({
   generation,
   project,
+  provider,
 });
 
 // export type definition of API

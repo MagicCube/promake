@@ -14,9 +14,11 @@ import { cn } from "@/lib/utils";
 
 export function BatchSizeSelect({
   batchSize,
+  supportedBatchSizes = [1, 2, 3, 4, 5, 6, 7, 8],
   onSelect,
 }: {
   batchSize: number;
+  supportedBatchSizes?: number[];
   onSelect?: (batchSize: number) => void;
 }) {
   return (
@@ -40,15 +42,15 @@ export function BatchSizeSelect({
         <PromptInputCommand>
           <PromptInputCommandList>
             <PromptInputCommandGroup heading="Batch Size">
-              {Array.from({ length: 8 }).map((_, index) => (
+              {supportedBatchSizes.map((size) => (
                 <PromptInputCommandItem
-                  key={index}
-                  onSelect={() => onSelect?.(index + 1)}
+                  key={size}
+                  onSelect={() => onSelect?.(size)}
                 >
                   <div
                     className={cn(
                       "flex items-center justify-center gap-1",
-                      index + 1 === batchSize
+                      size === batchSize
                         ? "text-primary"
                         : "text-muted-foreground",
                     )}
@@ -56,15 +58,15 @@ export function BatchSizeSelect({
                     <X
                       className={cn(
                         "size-3",
-                        index + 1 === batchSize
+                        size === batchSize
                           ? "text-primary"
                           : "text-muted-foreground",
                       )}
                     />
-                    {index + 1}
+                    {size}
                   </div>
                   <span className="text-primary ml-auto">
-                    {index + 1 === batchSize ? "✓" : ""}
+                    {size === batchSize ? "✓" : ""}
                   </span>
                 </PromptInputCommandItem>
               ))}

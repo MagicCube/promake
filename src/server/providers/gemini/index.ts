@@ -1,6 +1,6 @@
 import { GoogleGenAI, type GenerateContentParameters } from "@google/genai";
 
-import { type GenerationInput } from "@/core/types";
+import { type GenerationInput, type GenerativeModel } from "@/core/types";
 import { isDataURL, parseDataURL } from "@/server/utils/data-url";
 
 import type { GenerationProvider } from "../generation-provider";
@@ -9,6 +9,14 @@ const ai = new GoogleGenAI({});
 
 export class GeminiGenerationProvider implements GenerationProvider {
   name = "gemini";
+  displayName = "Gemini";
+
+  supportedModels = [
+    {
+      name: "gemini-3-pro-image-preview",
+      displayName: "Nano Banana Pro",
+    } satisfies GenerativeModel,
+  ];
 
   async generate(input: GenerationInput) {
     const params: GenerateContentParameters = {
