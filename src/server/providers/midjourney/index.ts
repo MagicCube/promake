@@ -36,12 +36,19 @@ export class MidjourneyGenerationProvider implements GenerationProvider {
 
     let ticks = 0;
     let errors = 0;
+    let firstTime = true;
+    let progress = 0;
     while (true) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, firstTime ? 5000 : progress > 88 ? 1000 : 4000),
+      );
+      firstTime = false;
       try {
         const result = await request<{
           status: string;
           progress: string;
           imageUrls: { url: string }[];
+          failReason: string;
         }>("GET", `task/${taskId}/fetch`, undefined);
         if (result.status === "SUCCESS") {
           return result.imageUrls.map((i) => {
@@ -50,13 +57,14 @@ export class MidjourneyGenerationProvider implements GenerationProvider {
               mimeType: i.url.endsWith("png") ? "image/png" : "image/jpeg",
             };
           });
-        } else if (result.status === "ERROR") {
+        } else if (result.status === "FAILURE") {
           console.error(result);
-          throw new Error("Failed to generate image using Midjourney");
-        } else {
-          console.info(result.status, result.progress);
+          throw new Error(
+            "Failed to generate image using Midjourney: " + result.failReason,
+          );
         }
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        progress = parseInt(result.progress);
+        console.info("Midjourney Task ID", taskId, `${progress}%`);
         ticks++;
         if (ticks > 120) {
           throw new Error("Failed to generate image using Midjourney");
