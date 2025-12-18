@@ -179,9 +179,7 @@ export const router = createTRPCRouter({
         }
         const outputs = await provider.batchGenerate(input, batchSize);
         return outputs.map((output) => {
-          const file =
-            "https://file.302.ai/gpt/imgs/20251218/6efbcfd46f07405196a4099658c82a28.jpg";
-          const id = /imgs\/\d{8}\/(\w+)\.jpg/.exec(file)![1]!;
+          const id = /imgs\/\d{8}\/(\w+)\.jpg/.exec(output.url)![1]!;
           return {
             id,
             url: output.url,

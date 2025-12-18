@@ -15,6 +15,7 @@ export class GeminiGenerationProvider implements GenerationProvider {
     {
       name: "gemini-3-pro-image-preview",
       displayName: "Nano Banana Pro",
+      supportedResolutions: ["1k", "2k", "4k"],
     } satisfies GenerativeModel,
   ];
 

@@ -15,6 +15,13 @@ export class MidjourneyGenerationProvider implements GenerationProvider {
       supportedBatchSizes: [4],
       supportedResolutions: [],
     } satisfies GenerativeModel,
+    {
+      name: "NIJI_JOURNEY",
+      displayName: "Niji",
+      supportBatchGeneration: true,
+      supportedBatchSizes: [4],
+      supportedResolutions: [],
+    } satisfies GenerativeModel,
   ];
 
   async batchGenerate(input: GenerationInput) {
@@ -28,29 +35,39 @@ export class MidjourneyGenerationProvider implements GenerationProvider {
     console.info("Midjourney Task ID", taskId);
 
     let ticks = 0;
+    let errors = 0;
     while (true) {
-      const result = await request<{
-        status: string;
-        progress: string;
-        imageUrls: { url: string }[];
-      }>("GET", `task/${taskId}/fetch`, undefined);
-      if (result.status === "SUCCESS") {
-        return result.imageUrls.map((i) => {
-          return {
-            url: i.url,
-            mimeType: i.url.endsWith("png") ? "image/png" : "image/jpeg",
-          };
-        });
-      } else if (result.status === "ERROR") {
-        console.error(result);
-        throw new Error("Failed to generate image using Midjourney");
-      } else {
-        console.info(result.status, result.progress);
-      }
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      ticks++;
-      if (ticks > 120) {
-        throw new Error("Failed to generate image using Midjourney");
+      try {
+        const result = await request<{
+          status: string;
+          progress: string;
+          imageUrls: { url: string }[];
+        }>("GET", `task/${taskId}/fetch`, undefined);
+        if (result.status === "SUCCESS") {
+          return result.imageUrls.map((i) => {
+            return {
+              url: i.url,
+              mimeType: i.url.endsWith("png") ? "image/png" : "image/jpeg",
+            };
+          });
+        } else if (result.status === "ERROR") {
+          console.error(result);
+          throw new Error("Failed to generate image using Midjourney");
+        } else {
+          console.info(result.status, result.progress);
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        ticks++;
+        if (ticks > 120) {
+          throw new Error("Failed to generate image using Midjourney");
+        }
+      } catch (e) {
+        errors++;
+        if (errors > 5) {
+          throw new Error("Failed to generate image using Midjourney");
+        } else {
+          console.error(e);
+        }
       }
     }
   }
