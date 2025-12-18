@@ -1,4 +1,4 @@
-import { Cpu } from "lucide-react";
+import { Banana, Cpu, Sailboat } from "lucide-react";
 import { useMemo } from "react";
 
 import {
@@ -41,12 +41,26 @@ export function ModelSelect({
 }) {
   const { data: providers = [] } = api.provider.list.useQuery();
   const model = useModel(modelName);
+  const icon = useMemo(() => {
+    const provider = providers.find((p) =>
+      p.supportedModels.some((m) => m.name === model?.name),
+    );
+    if (!provider) return null;
+    switch (provider.name) {
+      case "gemini":
+        return <Banana />;
+      case "midjourney":
+        return <Sailboat />;
+      default:
+        return <Cpu />;
+    }
+  }, [model, providers]);
   return (
     <PromptInputHoverCard openDelay={200} closeDelay={100}>
       <PromptInputHoverCardTrigger className="inline-block">
         <PromptInputButton className="px-1! py-2" size="xs" variant="ghost">
           <div className="flex items-center justify-center gap-0.5">
-            <Cpu />
+            {icon}
             <span className="font-normal">
               {model?.displayName ?? modelName}
             </span>
