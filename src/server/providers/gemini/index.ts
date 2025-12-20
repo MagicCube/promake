@@ -58,6 +58,9 @@ export class GeminiGenerationProvider implements GenerationProvider {
         }
       }
     }
-    throw new Error("No image generated");
+    throw new Error(
+      "No image generated, response with " +
+        response.candidates?.[0]?.finishReason,
+    );
   }
 }
