@@ -110,6 +110,7 @@ export function useRegenerate() {
         generationId: generation.id,
         data: {
           outputs,
+          defaultOutputId: undefined,
         },
       });
 
