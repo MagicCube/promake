@@ -5,6 +5,8 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { getSession } from "@/server/better-auth/server";
 
+import { createProject } from "./server/biz-logic/project";
+
 const PROTECTED_PATHS = ["/workspace"];
 
 export default async function proxy(req: NextRequest) {
@@ -32,7 +34,15 @@ export default async function proxy(req: NextRequest) {
   ) {
     const projectId = parts[2];
     const projectPath = path.join("./public/data/projects/", projectId);
-
+    if (!fs.existsSync(projectPath) && projectId === "default") {
+      await createProject({
+        projectId: "default",
+        data: {
+          name: "Playground",
+          generations: [],
+        },
+      });
+    }
     if (fs.existsSync(projectPath)) {
       return NextResponse.next();
     } else {
