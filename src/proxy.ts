@@ -12,6 +12,10 @@ const PROTECTED_PATHS = ["/workspace"];
 export default async function proxy(req: NextRequest) {
   const session = await getSession();
 
+  if (req.nextUrl.pathname.includes("/_next")) {
+    return NextResponse.next();
+  }
+
   if (
     !session?.user &&
     PROTECTED_PATHS.some((path) => req.nextUrl.pathname.includes(path))
