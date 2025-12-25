@@ -93,7 +93,11 @@ export const router = createTRPCRouter({
           output.state === "completed" &&
           output.mimeType.startsWith("image/")
         ) {
-          thumbnail = `/data/projects/${project.id}/${generation.id}/${output.url}`;
+          if (!output.url.startsWith("http")) {
+            thumbnail = `/data/projects/${project.id}/${generation.id}/${output.url}`;
+          } else {
+            thumbnail = output.url;
+          }
         }
       }
       return {
